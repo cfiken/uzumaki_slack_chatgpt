@@ -1,5 +1,11 @@
 from datetime import date
-import openai
+from langchain.chat_models import ChatOpenAI
+from langchain.schema import (
+    BaseMessage,
+    AIMessage,
+    HumanMessage,
+    SystemMessage
+)
 from slack_app.util.routine import get_logger
 
 
@@ -14,28 +20,33 @@ logger = get_logger(__name__)
 
 class ChatGPT:
     def __init__(self, model_name: str = DEFAULT_MODEL_NAME) -> None:
-        self.model_name = model_name
+        self.chat = ChatOpenAI(model_name=model_name)
 
-    def chat_request(self, model_name: str, messages: list[dict[str: str]]) -> str:
-        response = openai.ChatCompletion.create(
-            model=model_name,
-            messages=messages
-        )
-        return response.choices[0]['message']['content']
+    def chat_request(self, messages: list[dict[str: str]]) -> str:
+        response = self.chat(messages=messages)
+        return response.content
 
     def run(self, messages: list[dict[str, str]]) -> str:
-        chatgpt_messages = [
-            {'role': 'system', 'content': SYSTEM_CONTENT},
-        ]
-        for message in messages:
-            content = self._remove_mention(message['content'])
-            role = 'assistant' if message['role'] == 'bot' or message['role'] == BOT_USER_ID[1:] else 'user'
-            chatgpt_messages.append({'role': role, 'content': content})
-
-        logger.info(f'chatgpt request: {chatgpt_messages}, with model {self.model_name}')
-        res = self.chat_request(self.model_name, chatgpt_messages)
+        chatgpt_messages = self._prepare_messages(messages)
+        logger.info(f'chatgpt request: {chatgpt_messages}')
+        res = self.chat_request(chatgpt_messages)
         logger.info(f'chatgpt response: {res}')
         return res
     
     def _remove_mention(self, content: str) -> str:
         return content.replace(f'<{BOT_USER_ID}>', '').strip()
+    
+    def _prepare_messages(self, messages: list[dict[str, str]]) -> list[BaseMessage]:
+        chatgpt_messages = [
+            SystemMessage(content=SYSTEM_CONTENT)
+        ]
+        for message in messages:
+            content = self._remove_mention(message['content'])
+            if message['role'] == 'bot' or message['role'] == BOT_USER_ID[1:]:
+                _message = AIMessage(content=content)
+            else:
+                _message = HumanMessage(content=content)
+            chatgpt_messages.append(_message)
+        return chatgpt_messages
+
+    
