@@ -1,0 +1,20 @@
+# 開発用コンテナ群
+
+version: "3.7"
+services:
+  myapp:
+    image: cfiken/python
+    command: ["poetry", "run", "python", "-m","slack_app.app"]
+    container_name: uzumaki_slack_chatgpt
+    restart: "no"
+    volumes:
+      - type: bind
+        source: .
+        target: /app
+      - type: bind
+        source: $SSH_AUTH_SOCK
+        target: /ssh-agent
+    environment:
+      SSH_AUTH_SOCK: /ssh-agent
+    tty: true
+    stdin_open: true
