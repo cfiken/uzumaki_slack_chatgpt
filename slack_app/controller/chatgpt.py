@@ -3,9 +3,6 @@ from slack_app.model.chatgpt import ChatGPT
 from slack_app.controller.base import Controller
 
 
-DEFAULT_MODEL_NAME = 'gpt-3.5-turbo'
-
-
 class ChatGPTController(Controller):
     def __init__(self, app: App) -> None:
         super().__init__()

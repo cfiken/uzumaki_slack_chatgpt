@@ -9,7 +9,7 @@ from langchain.schema import (
 from slack_app.util.routine import get_logger
 
 
-DEFAULT_MODEL_NAME = 'gpt-3.5-turbo'
+DEFAULT_MODEL_NAME = 'gpt-4'
 KNOWLEDGE_CUTOFF  = '2021-09'
 SYSTEM_CONTENT = f'You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible. \
 Knowledge cutoff: {KNOWLEDGE_CUTOFF} Current date: {date.today()}'
@@ -20,7 +20,7 @@ logger = get_logger(__name__)
 
 class ChatGPT:
     def __init__(self, model_name: str = DEFAULT_MODEL_NAME) -> None:
-        self.chat = ChatOpenAI(model_name=model_name)
+        self.chat = ChatOpenAI(model_name=model_name, request_timeout=180)
 
     def chat_request(self, messages: list[dict[str: str]]) -> str:
         response = self.chat(messages=messages)
