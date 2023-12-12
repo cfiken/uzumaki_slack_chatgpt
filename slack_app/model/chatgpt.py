@@ -9,8 +9,8 @@ from langchain.schema import (
 from slack_app.util.routine import get_logger
 
 
-DEFAULT_MODEL_NAME = 'gpt-4'
-KNOWLEDGE_CUTOFF  = '2021-09'
+DEFAULT_MODEL_NAME = 'gpt-4-1106-preview'
+KNOWLEDGE_CUTOFF  = '2023-04'
 SYSTEM_CONTENT = f'You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible. \
 Knowledge cutoff: {KNOWLEDGE_CUTOFF} Current date: {date.today()}'
 BOT_USER_ID = '@U0504NZFL4S'
